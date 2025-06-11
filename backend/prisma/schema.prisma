@@ -6,10 +6,23 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+
+model User{
+  id Int @default(autoincrement()) @id
+  firstName String 
+  lastName String
+  email String @unique 
+  phoneNumber String? 
+  pfp String @default("http://res.cloudinary.com/dz12pywzs/image/upload/v1749636867/s2hffialvfvdmqykovpr.jpg")
+  orderStatusNoti Boolean @default(true)
+  passwordChangesNoti Boolean @default(true)
+ specialOfferNoti Boolean @default(true)
+ NewsLetterNoti Boolean @default(true)
 }
