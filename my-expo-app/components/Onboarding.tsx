@@ -3,22 +3,13 @@ import { View, Text, Image, Pressable, ScrollView } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackActions } from '@react-navigation/native';
 
 const Onboarding = ({ navigation }: any) => {
   const [Name, setName] = useState('');
   const [Email, setEmail] = useState('');
   const [Loader, setLoader] = useState(false);
   const [message, setmessage] = useState('');
-  const [Jwt, setJwt] = useState('');
-
-  useEffect(() => {
-    const settoken = async () => {
-      console.log(Jwt);
-      await AsyncStorage.setItem('jwtToken', Jwt);
-    };
-
-    settoken();
-  }, [Jwt]);
 
   const handleSubmit = () => {
     if (!Email || !Name) {
@@ -34,13 +25,16 @@ const Onboarding = ({ navigation }: any) => {
       })
       .then((res) => {
         setmessage(res.data.message);
-        setJwt(res.data.jwt);
-
-        console.log(res.data.jwt);
 
         setLoader(false);
         if (res.status === 200) {
-          navigation.push('profileSection');
+          const settoken = async () => {
+            await AsyncStorage.setItem('jwtToken', res.data.jwt);
+            await AsyncStorage.setItem('Onboarding', 'true');
+          };
+
+          settoken();
+          navigation.dispatch(StackActions.replace('profileSection'));
         }
       })
       .catch((err) => {
@@ -64,7 +58,6 @@ const Onboarding = ({ navigation }: any) => {
         </Text>
         <Text className="-mt-2 text-white ">Chicago</Text>
         <View className="flex flex-row items-center justify-center gap-9">
-          {' '}
           <Image
             source={require('../assets/xklIQmqvTkCnBxdLLspn8w_c1f5d03a48b74e3db162fafa4bee95e1_Little-Lemon-Images/Bruschetta.png')}
             className="h-44 w-44 rounded-md shadow-lg"

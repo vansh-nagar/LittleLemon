@@ -63,8 +63,12 @@ app.post("/getUserDetails", async (req, res) => {
   try {
     const { token } = req.body;
 
+    console.log("token :", token);
+
     if (!token) {
       res.status(400).json({ message: "invalid token" });
+      console.log("invalid token");
+      return;
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_STRING);

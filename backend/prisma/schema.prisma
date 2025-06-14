@@ -26,3 +26,14 @@ model User{
  specialOfferNoti Boolean @default(true)
  NewsLetterNoti Boolean @default(true)
 }
+
+model MenuItem {
+  id Int @default(autoincrement()) @id
+  name String 
+  description String 
+  price Float 
+  imageUrl String? 
+  category String? 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
