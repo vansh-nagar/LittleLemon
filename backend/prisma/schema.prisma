@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SpiceLevel {
+  MILD
+  MEDIUM
+  SPICY
+  
+}
 
 model User{
   id Int @default(autoincrement()) @id
@@ -25,7 +31,11 @@ model User{
   passwordChangesNoti Boolean @default(true)
  specialOfferNoti Boolean @default(true)
  NewsLetterNoti Boolean @default(true)
+ cartItemCount Int @default(0)
+ cart CartItem[]
 }
+
+
 
 model MenuItem {
   id Int @default(autoincrement()) @id
@@ -33,7 +43,26 @@ model MenuItem {
   description String 
   price Float 
   imageUrl String? 
-  category String? 
+  title String? 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  rating Float @default(0)
+  calories Int @default(0)
+  prepTime Int @default(0)
+  spiceLevel SpiceLevel 
+  cartItems CartItem[]
 }
+
+
+model CartItem {
+  id Int @default(autoincrement()) @id
+  UserId Int
+  quantity Int @default(1)
+  menuItemId Int
+  
+  menuItem MenuItem @relation(fields: [menuItemId] , references: [id])
+  user User @relation(fields: [UserId] , references: [id])
+
+}
+
+

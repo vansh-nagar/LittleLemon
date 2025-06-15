@@ -134,7 +134,6 @@ const ProfileSection = ({ navigation }: any) => {
           <TextInput
             className="mt-1 rounded-lg border border-main1 bg-neutral-50 px-3 py-2"
             value={email}
-            onChangeText={setEmail}
             placeholder="Email"
             placeholderTextColor="#a3a3a3"
             keyboardType="email-address"

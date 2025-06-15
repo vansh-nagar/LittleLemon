@@ -80,6 +80,49 @@ export default function App({ navigation }: any) {
               ),
             }}
           />
+
+          <stack.Screen
+            name="ItemView"
+            component={ItemView}
+            options={({ navigation }) => ({
+              headerTitle: () => (
+                <Image
+                  source={require('./assets/xklIQmqvTkCnBxdLLspn8w_c1f5d03a48b74e3db162fafa4bee95e1_Little-Lemon-Images/Logo.png')}></Image>
+              ),
+              headerTitleAlign: 'center',
+              headerRight: () => (
+                <Pressable
+                  onPress={() => {
+                    navigation.navigate('profileSection');
+                  }}>
+                  <Image
+                    className="mr-5 h-14 w-14"
+                    source={require('./assets/xklIQmqvTkCnBxdLLspn8w_c1f5d03a48b74e3db162fafa4bee95e1_Little-Lemon-Images/Profile.png')}></Image>
+                </Pressable>
+              ),
+            })}
+          />
+          <stack.Screen
+            name="Checkout"
+            component={Checkout}
+            options={({ navigation }) => ({
+              headerTitle: () => (
+                <Image
+                  source={require('./assets/xklIQmqvTkCnBxdLLspn8w_c1f5d03a48b74e3db162fafa4bee95e1_Little-Lemon-Images/Logo.png')}></Image>
+              ),
+              headerTitleAlign: 'center',
+              headerRight: () => (
+                <Pressable
+                  onPress={() => {
+                    navigation.navigate('profileSection');
+                  }}>
+                  <Image
+                    className="mr-5 h-14 w-14"
+                    source={require('./assets/xklIQmqvTkCnBxdLLspn8w_c1f5d03a48b74e3db162fafa4bee95e1_Little-Lemon-Images/Profile.png')}></Image>
+                </Pressable>
+              ),
+            })}
+          />
         </stack.Navigator>
       </NavigationContainer>
     </>

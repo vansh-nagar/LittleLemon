@@ -95,7 +95,7 @@ const Onboarding = ({ navigation }: any) => {
 
         <Pressable
           onPress={handleSubmit}
-          className={` absolute bottom-16 right-4 flex h-14 items-center justify-center rounded-md px-12 shadow-lg   ${Name && Email ? 'bg-main2 ' : 'bg-yellow-600'}`}>
+          className={` flex h-14 items-center justify-center rounded-md px-12 shadow-lg   ${Name && Email ? 'bg-main2 ' : 'bg-yellow-600'}`}>
           <Text className="text-center">Next</Text>
         </Pressable>
       </View>

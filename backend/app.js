@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import jwt from "jsonwebtoken";
@@ -49,7 +49,10 @@ app.post("/login", async (req, res) => {
       },
     });
 
-    const token = await jwt.sign({ email }, `${process.env.JWT_STRING}`);
+    const token = await jwt.sign(
+      { id: createdUser.id },
+      `${process.env.JWT_STRING}`
+    );
 
     console.log("created user :", createdUser);
 
@@ -73,13 +76,13 @@ app.post("/getUserDetails", async (req, res) => {
 
     const decodedToken = jwt.verify(token, process.env.JWT_STRING);
 
-    if (!decodedToken.email) {
+    if (!decodedToken.id) {
       return;
     }
 
-    const userDetails = await prisma.user.findFirst({
+    const userDetails = await prisma.user.findUnique({
       where: {
-        email: decodedToken.email,
+        id: decodedToken.id,
       },
     });
 
@@ -115,7 +118,7 @@ app.post("/saveProfileInfo", async (req, res) => {
 
   try {
     const updatedUser = await prisma.user.update({
-      where: { email: decodedToken.email },
+      where: { id: decodedToken.id },
       data: {
         firstName,
         lastName,
@@ -148,11 +151,115 @@ app.post("/Logout", async (req, res) => {
 
     await prisma.user.delete({
       where: {
-        email: decodedToken.email,
+        id: decodedToken.id,
       },
     });
   } catch (error) {
     console.log(err.message);
+  }
+});
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post("/getMenu", async (req, res) => {
+  const filter = req.body.filter || "All";
+  const { input } = req.body;
+
+  try {
+    if (!input) {
+      let menuItems;
+      if (filter === "All") {
+        menuItems = await prisma.menuItem.findMany();
+      } else {
+        menuItems = await prisma.menuItem.findMany({
+          where: {
+            title: filter,
+          },
+        });
+        console.log("hello");
+      }
+      res.status(200).json({ data: menuItems });
+    } else {
+      const menuItems = await prisma.menuItem.findMany({
+        where: {
+          name: {
+            contains: input,
+            mode: "insensitive",
+          },
+        },
+      });
+      console.log("hi:", menuItems);
+
+      res.status(200).json({ data: menuItems });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+/////////////////////////////////////////////
+app.post("/AddToCart", async (req, res) => {
+  try {
+    const { item, data } = req.body;
+
+    const decodedToken = jwt.verify(data, process.env.JWT_STRING);
+    console.log(decodedToken.id, item.id);
+
+    const itemAdded = await prisma.cartItem.create({
+      data: {
+        quantity: 1,
+        menuItemId: item.id,
+        UserId: decodedToken.id,
+      },
+    });
+
+    res.status(200).json({ message: itemAdded });
+  } catch (error) {
+    res.status(500).json({ message: err.message });
+  }
+});
+/////////////////////////////////////////////////////////
+app.post("/getCart", async (req, res) => {
+  try {
+    const { token } = req.body;
+    console.log(token);
+
+    const decodedToken = jwt.verify(token, process.env.JWT_STRING);
+    console.log(decodedToken.id);
+
+    const data = await prisma.user.findUnique({
+      where: {
+        id: decodedToken.id,
+      },
+      include: {
+        cart: {
+          include: {
+            menuItem: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      message: data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+/////////////////////////////////////////////////////////////////
+app.post("/CartCount", async (req, res) => {
+  try {
+    console.log("call");
+    const { token } = req.body;
+    const decodedToken = jwt.verify(token, process.env.JWT_STRING);
+
+    const CartCount = await prisma.cartItem.count({
+      where: {
+        UserId: decodedToken.id,
+      },
+    });
+
+    res.status(200).json({ message: CartCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 app.listen(3000);
