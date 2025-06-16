@@ -251,13 +251,101 @@ app.post("/CartCount", async (req, res) => {
     const { token } = req.body;
     const decodedToken = jwt.verify(token, process.env.JWT_STRING);
 
-    const CartCount = await prisma.cartItem.count({
+    const data = await prisma.cartItem.findMany({
       where: {
         UserId: decodedToken.id,
       },
     });
 
+    console.log(data);
+
+    let CartCount = 0;
+    data.forEach((ele) => {
+      console.log(ele.quantity);
+      CartCount += ele.quantity;
+    });
+
+    console.log(CartCount);
+
     res.status(200).json({ message: CartCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+//////////////////////////////////////////////////////////////////////////////////
+app.post("/IncreaseQuant", async (req, res) => {
+  try {
+    const { data, token } = req.body;
+
+    if (!data) {
+      return res.status(400).json({ message: "decrement data is undefined" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_STRING);
+
+    if (decodedToken.id !== data.userId) {
+      return res.status(400).json({ message: "invalid Id" });
+    }
+
+    const updatedData = await prisma.cartItem.update({
+      where: {
+        id: data.ItemId,
+      },
+      data: {
+        quantity: { increment: 1 },
+      },
+    });
+
+    console.log(updatedData);
+
+    console.log(data, decodedToken);
+
+    res.status(200).json({
+      message: updatedData,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+/////////////////////////////////////////////////////////////////////
+app.post("/DecreaseQuant", async (req, res) => {
+  try {
+    const { data, token } = req.body;
+
+    if (!data) {
+      return res.status(400).json({ message: "decrement data is undefined" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_STRING);
+
+    if (decodedToken.id !== data.userId) {
+      return res.status(400).json({ message: "invalid Id" });
+    }
+
+    const updatedData = await prisma.cartItem.update({
+      where: {
+        id: data.ItemId,
+      },
+      data: {
+        quantity: { decrement: 1 },
+      },
+    });
+
+    console.log("Updated Data ", updatedData);
+    if (updatedData.quantity === 0) {
+      const deletedItem = await prisma.cartItem.delete({
+        where: {
+          id: data.ItemId,
+        },
+      });
+
+      console.log("Deleted Item:", deletedItem);
+    }
+
+    console.log(data, decodedToken);
+    res.status(200).json({
+      message: updatedData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
